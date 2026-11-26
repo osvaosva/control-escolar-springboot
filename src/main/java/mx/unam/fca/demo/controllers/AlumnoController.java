@@ -22,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/alumnos")
 @Tag(name = "Alumnos", description = "Matrícula de estudiantes")
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole('ADMIN')")
 public class AlumnoController {
 
     private final AlumnoRepository alumnos;
@@ -77,7 +79,4 @@ public class AlumnoController {
         return ResponseEntity.created(URI.create("/alumnos/" + guardado.getIdAlumno()))
                 .body(AlumnoResponse.from(guardado));
     }
-
-    @SecurityRequirement(name = "bearerAuth")
-@PreAuthorize("hasRole('ADMIN')")
 }

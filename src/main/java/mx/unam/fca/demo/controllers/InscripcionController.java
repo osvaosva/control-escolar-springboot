@@ -1,6 +1,7 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,6 +24,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Tag(name = "Inscripciones", description = "Relación muchos a muchos entre alumnos y cursos")
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasAnyRole('USER','ADMIN')")
 public class InscripcionController {
 
     private final InscripcionRepository inscripciones;
@@ -110,6 +113,4 @@ public class InscripcionController {
         inscripciones.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-    @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
 }
