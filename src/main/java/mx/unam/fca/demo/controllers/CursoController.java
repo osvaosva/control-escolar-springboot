@@ -1,6 +1,7 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/cursos")
 @Tag(name = "Cursos", description = "Oferta de asignaturas por semestre")
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole('ADMIN')")
 public class CursoController {
 
     private final CursoRepository cursos;
@@ -50,9 +53,7 @@ public class CursoController {
         return cursos.findById(id)
                 .map(c -> ResponseEntity.ok(CursoResponse.from(c)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    @PreAuthorize("permitAll()")
-@SecurityRequirements
-            }
+    }
 
     @PostMapping
     @Operation(summary = "Crear un curso")
@@ -87,7 +88,4 @@ public class CursoController {
         return ResponseEntity.created(URI.create("/cursos/" + guardado.getIdCurso()))
                 .body(CursoResponse.from(guardado));
     }
-
-    @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN')")
 }

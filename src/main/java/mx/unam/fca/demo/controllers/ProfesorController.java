@@ -1,6 +1,7 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -17,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/profesores")
 @Tag(name = "Profesores", description = "Plantilla docente")
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole('ADMIN')")
 public class ProfesorController {
 
     private final ProfesorRepository repository;
@@ -57,7 +60,4 @@ public class ProfesorController {
         return ResponseEntity.created(URI.create("/profesores/" + guardado.getIdProfesor()))
                 .body(guardado);
     }
-
-    @SecurityRequirement(name = "bearerAuth")
-@PreAuthorize("hasRole('ADMIN')")
 }
