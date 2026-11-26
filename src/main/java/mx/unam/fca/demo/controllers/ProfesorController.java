@@ -1,6 +1,7 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -9,6 +10,7 @@ import mx.unam.fca.demo.models.Profesor;
 import mx.unam.fca.demo.repositories.ProfesorRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,12 +26,16 @@ public class ProfesorController {
     }
 
     @GetMapping
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Listar profesores")
     public List<Profesor> listar() {
         return repository.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Buscar un profesor por ID")
     public ResponseEntity<Profesor> obtener(@PathVariable Integer id) {
         return repository.findById(id)
@@ -51,4 +57,7 @@ public class ProfesorController {
         return ResponseEntity.created(URI.create("/profesores/" + guardado.getIdProfesor()))
                 .body(guardado);
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole('ADMIN')")
 }

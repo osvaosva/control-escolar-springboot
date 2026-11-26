@@ -1,6 +1,8 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -13,6 +15,7 @@ import mx.unam.fca.demo.repositories.AlumnoRepository;
 import mx.unam.fca.demo.repositories.EntidadFederativaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,18 +33,22 @@ public class AlumnoController {
     }
 
     @GetMapping
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Listar alumnos")
     public List<AlumnoResponse> listar() {
         return alumnos.findAll().stream().map(AlumnoResponse::from).toList();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Buscar un alumno por ID")
     public ResponseEntity<AlumnoResponse> obtener(@PathVariable Integer id) {
         return alumnos.findById(id)
                 .map(a -> ResponseEntity.ok(AlumnoResponse.from(a)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+            }
 
     @PostMapping
     @Operation(summary = "Registrar un alumno")
@@ -70,4 +77,7 @@ public class AlumnoController {
         return ResponseEntity.created(URI.create("/alumnos/" + guardado.getIdAlumno()))
                 .body(AlumnoResponse.from(guardado));
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole('ADMIN')")
 }

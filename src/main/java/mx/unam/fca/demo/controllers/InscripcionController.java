@@ -1,6 +1,7 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -16,6 +17,7 @@ import mx.unam.fca.demo.repositories.CursoRepository;
 import mx.unam.fca.demo.repositories.InscripcionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,12 +37,16 @@ public class InscripcionController {
     }
 
     @GetMapping("/inscripciones")
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Listar todas las inscripciones")
     public List<InscripcionResponse> listar() {
         return inscripciones.findAll().stream().map(InscripcionResponse::from).toList();
     }
 
     @GetMapping("/alumnos/{idAlumno}/inscripciones")
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Cursos en los que está inscrito un alumno")
     public ResponseEntity<List<InscripcionResponse>> deAlumno(@PathVariable Integer idAlumno) {
         if (!alumnos.existsById(idAlumno)) {
@@ -51,6 +57,8 @@ public class InscripcionController {
     }
 
     @GetMapping("/cursos/{idCurso}/inscripciones")
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Alumnos inscritos en un curso")
     public ResponseEntity<List<InscripcionResponse>> deCurso(@PathVariable Integer idCurso) {
         if (!cursos.existsById(idCurso)) {
@@ -102,4 +110,6 @@ public class InscripcionController {
         inscripciones.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
 }

@@ -1,6 +1,7 @@
 package mx.unam.fca.demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -11,6 +12,7 @@ import mx.unam.fca.demo.models.*;
 import mx.unam.fca.demo.repositories.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,18 +35,24 @@ public class CursoController {
     }
 
     @GetMapping
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Listar cursos")
     public List<CursoResponse> listar() {
         return cursos.findAll().stream().map(CursoResponse::from).toList();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
+    @SecurityRequirements
     @Operation(summary = "Buscar un curso por ID")
     public ResponseEntity<CursoResponse> obtener(@PathVariable Integer id) {
         return cursos.findById(id)
                 .map(c -> ResponseEntity.ok(CursoResponse.from(c)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    @PreAuthorize("permitAll()")
+@SecurityRequirements
+            }
 
     @PostMapping
     @Operation(summary = "Crear un curso")
@@ -79,4 +87,7 @@ public class CursoController {
         return ResponseEntity.created(URI.create("/cursos/" + guardado.getIdCurso()))
                 .body(CursoResponse.from(guardado));
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
 }
