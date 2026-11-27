@@ -1,5 +1,8 @@
 package mx.unam.fca.demo.controllers;
 
+
+import java.net.URI;
+import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -31,9 +34,20 @@ public class EntidadFederativaController {
         return repository.findAll();
     }
 
-    @PostMapping
-    @Operation(summary = "Crear una entidad federativa (solo ADMIN)")
-    public EntidadFederativa crear(@RequestBody EntidadFederativa entidad) {
-        return repository.save(entidad);
-    }
+   
+@PostMapping
+@Operation(summary = "Crear una entidad federativa (solo ADMIN)")
+public ResponseEntity<EntidadFederativa> crear(
+        @RequestBody EntidadFederativa entidad) {
+
+    EntidadFederativa guardada = repository.save(entidad);
+
+    URI ubicacion = URI.create(
+        "/entidades/" + guardada.getIdEntidad()
+    );
+
+    return ResponseEntity
+        .created(ubicacion)
+        .body(guardada);
+}
 }
