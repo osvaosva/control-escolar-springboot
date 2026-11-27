@@ -1,5 +1,8 @@
 package mx.unam.fca.demo.controllers;
 
+
+import java.net.URI;
+import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -40,8 +43,18 @@ public class AsignaturaController {
     }
 
     @PostMapping
-    @Operation(summary = "Crear una asignatura (solo ADMIN)")
-    public Asignatura crear(@RequestBody Asignatura asignatura) {
-        return repository.save(asignatura);
-    }
+@Operation(summary = "Crear una asignatura (solo ADMIN)")
+public ResponseEntity<Asignatura> crear(
+        @RequestBody Asignatura asignatura) {
+
+    Asignatura guardada = repository.save(asignatura);
+
+    URI ubicacion = URI.create(
+        "/asignaturas/" + guardada.getIdAsignatura()
+    );
+
+    return ResponseEntity
+        .created(ubicacion)
+        .body(guardada);
+}
 }
